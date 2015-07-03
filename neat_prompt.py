@@ -10,13 +10,15 @@ red = '\[\033[91;1m\]'
 green = '\[\033[32;1m\]'
 yellow = '\[\033[93;1m\]'
 cyan = '\[\033[36;1m\]'
-grey = '\[\033[37;1m\]'
+grey = '\[\033[38;2;127;127;127m\]'
 reset = '\[\033[0m\]'
 
 up = '\xe2\x86\x91'
 down = '\xe2\x86\x93'
 right = '\xe2\x86\x92'
 check = '\xe2\x9c\x93'
+pencil = '\xe2\x9c\x8e'
+hazard = '\xe2\x98\xa3'
 
 def color_msg(msg, color):
     return color+msg+reset
@@ -38,24 +40,38 @@ def local_is_older(branch):
 
 
 def dir_is_repo():
-    # fatal: Not a git repository (or any of the parent directories): .git
-    res = syscmd(['git','rev-parse','--show-toplevel'])
-    lines = [line for line in res.split('\n') if len(line)>0]
-    if 'fatal' in lines[0]:
-        return False
-    return True
+    res = syscmd(['git', 'rev-parse', '--is-inside-work-tree'])
+    if res.strip() == 'true':
+        return True
+    return False
+
+
+def get_repo_dirty_status():
+    cmd = ['git', 'status', '--porcelain']
+    res = syscmd(cmd)
+    l_dirt_status = [entry.split()[0] for entry in [l for l in res.split('\n') if len(l) > 0]]
+    dirty_status = {'modified': False, 'untracked': False}
+    if 'M' in l_dirt_status:
+        dirty_status['modified'] = True
+    if '??' in l_dirt_status:
+        dirty_status['untracked'] = True
+    return dirty_status
 
 
 def get_git_status():
     is_repo = dir_is_repo()
-    branch = ''
+    branch = None
     is_newer = False
     is_older = False
+    dirty_status = None
     if is_repo:
+        dirty_status = get_repo_dirty_status()
         branch = get_branch_name()
         is_newer = local_is_newer(branch)
         is_older = local_is_older(branch)
-    return {'branch': branch, 'newer': is_newer, 'older': is_older, 'repo': is_repo}
+    return {'branch': branch, 'newer': is_newer,
+            'older': is_older, 'repo': is_repo,
+            'dirty': dirty_status}
 
 
 def get_branch_name():
@@ -84,12 +100,23 @@ def assemble(name, host, git_status):
         prompt += color_msg(' (no-repository) ', grey)
         return prompt
 
+    markers = []
+    if git_status['dirty']['untracked']:
+        markers.append(hazard)
+    if git_status['dirty']['modified']:
+        markers.append(pencil)
     if git_status['newer']:
-        prompt += color_msg(' (' + git_status['branch'] + ' ' + up + ') ', cyan)
+        markers.append(up)
+        color = cyan
     elif git_status['older']:
-        prompt += color_msg(' (' + git_status['branch'] + ' ' + down + ') ', red)
+        markers.append(down)
+        color = red
     else:
-        prompt += color_msg(' (' + git_status['branch'] + ' ' + check + ') ', green)
+        markers.append(check)
+        color = green
+    git_message = ' ' + git_status['branch'] + ' ' + ' '.join(markers) + ' '
+    prompt += color_msg(git_message, color)
+
     return prompt
 
 
