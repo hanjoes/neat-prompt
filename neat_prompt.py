@@ -1,4 +1,5 @@
 import getpass
+import os
 import socket
 import subprocess
 
@@ -6,6 +7,9 @@ import subprocess
 # to the non-printable sequences, or
 # bash will remove the first prompt
 # line.
+import time
+from os import path
+
 red = '\[\033[91;1m\]'
 green = '\[\033[32;1m\]'
 yellow = '\[\033[93;1m\]'
@@ -13,12 +17,16 @@ cyan = '\[\033[36;1m\]'
 grey = '\[\033[38;2;127;127;127m\]'
 reset = '\[\033[0m\]'
 
-up = '\xe2\x86\x91'
-down = '\xe2\x86\x93'
+up = red + '\xe2\x86\x91' + reset
+cross = red + '\xe2\x9c\x97' + reset
 right = '\xe2\x86\x92'
-check = '\xe2\x9c\x93'
+check = green + '\xe2\x9c\x93' + reset
 pencil = '\xe2\x9c\x8e'
-hazard = '\xe2\x98\xa3'
+update = '\xe2\x9c\x89'
+
+tmp_dir = '/tmp/'
+
+SYNC_INTERVAL = 15
 
 def color_msg(msg, color):
     return color+msg+reset
@@ -53,12 +61,11 @@ def get_repo_dirty_status():
     dirty_status = {'modified': False, 'untracked': False}
     if 'M' in l_dirt_status:
         dirty_status['modified'] = True
-    if '??' in l_dirt_status:
-        dirty_status['untracked'] = True
     return dirty_status
 
 
 def get_git_status():
+    sync_succeeded = fetch_remote()
     is_repo = dir_is_repo()
     branch = None
     is_newer = False
@@ -71,7 +78,7 @@ def get_git_status():
         is_older = local_is_older(branch)
     return {'branch': branch, 'newer': is_newer,
             'older': is_older, 'repo': is_repo,
-            'dirty': dirty_status}
+            'dirty': dirty_status, 'sync': sync_succeeded}
 
 
 def get_branch_name():
@@ -94,6 +101,44 @@ def get_host():
     return socket.gethostbyname(socket.gethostname())
 
 
+def ensure_file_created(filename):
+    has_content = False
+    if path.isfile(filename):
+        fd = open(filename, 'r+')
+        if os.stat(filename).st_size > 0:
+            has_content = True
+    else:
+        fd = open(filename, 'w+')
+    return fd, has_content
+
+
+def sync_needed():
+    filename = tmp_dir + '.last_fetch_time'
+    fd, has_content = ensure_file_created(filename)
+    cur_time = int(time.time())
+    if has_content:
+        for l in fd:
+            if cur_time - int(l) > SYNC_INTERVAL:
+                fd.seek(0)
+                fd.write(str(cur_time))
+                return True
+    else:
+        fd.write(str(cur_time))
+        return True
+    return False
+
+
+def fetch_remote():
+    if not sync_needed():
+        return True
+    cmd = ['git', 'fetch']
+    try:
+        syscmd(cmd)
+        return True
+    except RuntimeError as e:
+        return False
+
+
 def assemble(name, host, git_status):
     prompt = color_msg(name, yellow) + '@' + color_msg(host, red)
     if not git_status['repo']:
@@ -101,21 +146,24 @@ def assemble(name, host, git_status):
         return prompt
 
     markers = []
-    if git_status['dirty']['untracked']:
-        markers.append(hazard)
+    modified = ''
     if git_status['dirty']['modified']:
-        markers.append(pencil)
+        modified = '*'
     if git_status['newer']:
         markers.append(up)
         color = cyan
     elif git_status['older']:
-        markers.append(down)
-        color = red
+        markers.append(cross)
+        color = grey
     else:
         markers.append(check)
         color = green
-    git_message = ' ' + git_status['branch'] + ' ' + ' '.join(markers) + ' '
-    prompt += color_msg(git_message, color)
+    synced = ''
+    if not git_status['sync']:
+        synced = '-not-synced'
+    prompt += color_msg(' (' + modified + git_status['branch'] + synced + ' ', color)
+    prompt += ' '.join(markers)
+    prompt += color_msg(') ', color)
 
     return prompt
 
