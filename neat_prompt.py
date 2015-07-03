@@ -2,12 +2,16 @@ import getpass
 import socket
 import subprocess
 
-red = '\033[91;1m'
-green = '\033[32;1m'
-yellow = '\033[93;1m'
-cyan = '\033[36;1m'
-grey = '\033[37;1m'
-reset = '\033[0m'
+# Need to add begin and end sequence
+# to the non-printable sequences, or
+# bash will remove the first prompt
+# line.
+red = '\[\033[91;1m\]'
+green = '\[\033[32;1m\]'
+yellow = '\[\033[93;1m\]'
+cyan = '\[\033[36;1m\]'
+grey = '\[\033[37;1m\]'
+reset = '\[\033[0m\]'
 
 up = '\xe2\x86\x91'
 down = '\xe2\x86\x93'
