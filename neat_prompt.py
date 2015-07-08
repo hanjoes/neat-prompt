@@ -65,7 +65,7 @@ def get_repo_dirty_status():
 
 
 def get_git_status():
-    sync_succeeded = fetch_remote()
+    synced = fetch_remote()
     is_repo = dir_is_repo()
     branch = None
     is_newer = False
@@ -74,11 +74,14 @@ def get_git_status():
     if is_repo:
         dirty_status = get_repo_dirty_status()
         branch = get_branch_name()
-        is_newer = local_is_newer(branch)
-        is_older = local_is_older(branch)
+        try:
+            is_newer = local_is_newer(branch)
+            is_older = local_is_older(branch)
+        except RuntimeError as e:
+            synced = False
     return {'branch': branch, 'newer': is_newer,
             'older': is_older, 'repo': is_repo,
-            'dirty': dirty_status, 'sync': sync_succeeded}
+            'dirty': dirty_status, 'sync': synced}
 
 
 def get_branch_name():
@@ -152,16 +155,18 @@ def assemble(name, host, git_status):
     if git_status['newer']:
         markers.append(up)
         color = cyan
-    elif git_status['older']:
+    elif git_status['older'] or not git_status['sync']:
         markers.append(cross)
         color = grey
     else:
         markers.append(check)
         color = green
-    synced = ''
+    msg = ''
     if not git_status['sync']:
-        synced = '-not-synced'
-    prompt += color_msg(' (' + modified + git_status['branch'] + synced + ' ', color)
+        msg = ' isolated'
+    elif git_status['older']:
+        msg = ' deprecated'
+    prompt += color_msg(' (' + modified + git_status['branch'] + msg + ' ', color)
     prompt += ' '.join(markers)
     prompt += color_msg(') ', color)
 
