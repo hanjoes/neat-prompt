@@ -101,8 +101,10 @@ def syscmd(cmd):
 
 
 def get_host():
-    return socket.gethostbyname(socket.gethostname())
-
+    try:
+	return socket.gethostbyname(socket.gethostname())
+    except socket.gaierror:
+	return '127.0.0.1'
 
 def ensure_file_created(filename):
     has_content = False
