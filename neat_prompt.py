@@ -28,8 +28,9 @@ tmp_dir = '/tmp/'
 
 SYNC_INTERVAL = 15
 
+
 def color_msg(msg, color):
-    return color+msg+reset
+    return color + msg + reset
 
 
 def local_is_newer(branch):
@@ -38,6 +39,7 @@ def local_is_newer(branch):
     if len(out) > 0:
         return True
     return False
+
 
 def local_is_older(branch):
     cmd = ['git', 'rev-list', 'HEAD..' + 'origin/' + branch]
@@ -102,9 +104,10 @@ def syscmd(cmd):
 
 def get_host():
     try:
-	return socket.gethostbyname(socket.gethostname())
+        return socket.gethostbyname(socket.gethostname())
     except socket.gaierror:
-	return '127.0.0.1'
+        return '127.0.0.1'
+
 
 def ensure_file_created(filename):
     has_content = False
@@ -145,10 +148,10 @@ def fetch_remote():
 
 
 def assemble(name, host, git_status):
-    prompt = color_msg(name, yellow) + '@' + color_msg(host, red)
+    prompt_str = color_msg(name, yellow) + '@' + color_msg(host, red)
     if not git_status['repo']:
-        prompt += color_msg(' (no-repository) ', grey)
-        return prompt
+        prompt_str += color_msg(' (no-repository) ', grey)
+        return prompt_str
 
     markers = []
     modified = ''
@@ -168,11 +171,11 @@ def assemble(name, host, git_status):
         msg = ' isolated'
     elif git_status['older']:
         msg = ' deprecated'
-    prompt += color_msg(' (' + modified + git_status['branch'] + msg + ' ', color)
-    prompt += ' '.join(markers)
-    prompt += color_msg(') ', color)
+    prompt_str += color_msg(' (' + modified + git_status['branch'] + msg + ' ', color)
+    prompt_str += ' '.join(markers)
+    prompt_str += color_msg(') ', color)
 
-    return prompt
+    return prompt_str
 
 
 def prompt():
@@ -183,6 +186,7 @@ def prompt():
     except RuntimeError as e:
         git_status = {'repo': False}
     print assemble(name, host, git_status) + right + ' '
+
 
 if __name__ == '__main__':
     prompt()
