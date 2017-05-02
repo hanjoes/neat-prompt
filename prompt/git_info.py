@@ -10,8 +10,9 @@ FAILED = "failed"
 
 NEWER = 1
 OLDER = 2
-DOWNLOADING = 3
-DISCONNECTED = 4
+IN_SYNC = 3
+DOWNLOADING = 4
+DISCONNECTED = 5
 # ------------------------------
 
 
@@ -22,6 +23,10 @@ class GitInfo(object):
         self._changed = False
         self._msg = ""
         self._status = None
+
+    def __str__(self):
+        changed_mark = "*" if self._changed else ""
+        return "({}{} {}{})".format(changed_mark, self._branch_name, str(self._status), self._msg)
 
     @property
     def branch_name(self):
@@ -46,3 +51,11 @@ class GitInfo(object):
     @msg.setter
     def msg(self, m):
         self._msg = m
+
+    @property
+    def status(self):
+        return self._status
+
+    @status.setter
+    def status(self, s):
+        self._status = s

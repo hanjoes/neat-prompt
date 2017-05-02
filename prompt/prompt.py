@@ -1,23 +1,23 @@
 class Prompt(object):
     def __init__(self):
-        self._user_str = ""
-        self._git_str = ""
+        self._user_info = None
+        self._git_info = None
 
     def __str__(self):
-        return self._user_str + " " + self._git_str
+        return str(self._user_info) + " " + str(self._git_info)
 
     @property
-    def user_str(self):
-        return self._user_str
+    def user_info(self):
+        return self._user_info
 
-    @user_str.setter
-    def user_str(self, s):
-        self._user_str = s
+    @user_info.setter
+    def user_info(self, s):
+        self._user_info = s
 
     @property
-    def git_str(self):
-        return self._git_str
+    def git_info(self):
+        return self._git_info
 
-    @git_str.setter
-    def git_str(self, s):
-        self._git_str = s
+    @git_info.setter
+    def git_info(self, s):
+        self._git_info = s

@@ -17,10 +17,10 @@ class Effect(object):
 class SetUserInfoEffect(Effect):
 
     def apply_to(self, prompt):
-        prompt.user_str = self._payload
+        prompt.user_info = self._payload
 
 
 class SetGitInfoEffect(Effect):
 
     def apply_to(self, prompt):
-        prompt._git_str = "(%s)" % self.payload
+        prompt._git_info = self._payload
