@@ -19,7 +19,6 @@ def fetch_and_update_status():
             cur_time = int(time.time())
             status = {"last_sync_time": cur_time}
             f.write(json.dumps(status))
-        time.sleep(5)
 
         release_file_lock(LOCK_FILE)
     except IOError:
