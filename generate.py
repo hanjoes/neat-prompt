@@ -1,3 +1,5 @@
+import logging
+
 from action import CollectUserInfoAction, CollectGitInfoAction
 from effect.effect import SetUserInfoEffect, SetGitInfoEffect
 from flow.flow import Flow
@@ -7,6 +9,8 @@ from prompt.prompt import Prompt
 def append_text_effect(prompt):
     pass
 
+
+logging.basicConfig(filename="/tmp/neat_prompt.log", level=logging.DEBUG)
 
 flow = Flow(Prompt())
 flow.add_action(CollectUserInfoAction(SetUserInfoEffect()))

@@ -1,13 +1,12 @@
 import getpass
 import json
 import socket
-import threading
-
 import time
 
 from prompt.git_info import GitInfo, DOWNLOADING, IN_SYNC, NEWER, OLDER
 from prompt.user_info import UserInfo
-from util.util import ensure_file_exists, acquire_file_lock, release_file_lock, syscmd
+from util.util import ensure_file_exists, syscmd, STATUS_FILE, SYNC_INTERVAL, \
+    syscmd_ub
 
 
 class Action(object):
@@ -32,11 +31,6 @@ class CollectUserInfoAction(Action):
             return socket.gethostbyname(socket.gethostname())
         except socket.gaierror:
             return '127.0.0.1'
-
-
-STATUS_FILE = "/tmp/.neat_prompt_repo_status"
-SYNC_INTERVAL = 15
-LOCK_FILE = "/tmp/.neat_prompt_lock_file"
 
 
 class CollectGitInfoAction(Action):
@@ -109,22 +103,4 @@ class CollectGitInfoAction(Action):
         """
         Asynchronously fetching and updating status file.
         """
-
-        def fetch_and_update_status():
-            """
-            Fetch and Update method with naive locking.
-            :return: None
-            """
-            acquire_file_lock(LOCK_FILE)
-
-            with open(STATUS_FILE, "w") as f:
-                syscmd(['git', 'fetch'])
-                cur_time = int(time.time())
-                status = {"last_sync_time": cur_time}
-                f.write(json.dumps(status))
-
-            release_file_lock(LOCK_FILE)
-
-        t = threading.Thread(target=fetch_and_update_status)
-        t.daemon = True
-        t.start()
+        syscmd_ub(['python', 'fetch_and_update_status.py'])
