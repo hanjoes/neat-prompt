@@ -21,7 +21,7 @@ class CollectUserInfoAction(Action):
     def execute(self):
         host = CollectUserInfoAction._get_host()
         name = getpass.getuser()
-        user_info = UserInfo(host + "@" + name)
+        user_info = UserInfo(name, host)
         self._effect.payload = user_info
         return self._effect
 
