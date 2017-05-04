@@ -44,7 +44,7 @@ class GitInfo(object):
             symbol = STATUS_VISUAL_MAP[self.status][1]
             result = "{0}({2}{3}{1} {4}{0}{5}){1}"\
                 .format(branch_color, RESET, changed_mark, self.branch_name, symbol, self.msg)
-        result += RIGHT
+        result += " " + RIGHT + " "
         return result
 
     @property
