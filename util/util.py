@@ -9,26 +9,24 @@ LOCK_FILE = "/tmp/.neat_prompt_lock_file"
 
 # Colors
 
-red = "\[\033[91;1m\]"
-green = "\[\033[32;1m\]"
-yellow = "\[\033[93;1m\]"
-cyan = "\[\033[36;1m\]"
-grey = "\[\033[38;2;127;127;127m\]"
-reset = "\[\033[0m\]"
+RED = "\[\033[91;1m\]"
+GREEN = "\[\033[32;1m\]"
+YELLOW = "\[\033[93;1m\]"
+CYAN = "\[\033[36;1m\]"
+GREY = "\[\033[38;2;127;127;127m\]"
+RESET = "\[\033[0m\]"
 
 # Glyphs
 
-up = red + "\xe2\x86\x91" + reset
-cross = red + "\xe2\x9c\x97" + reset
-right = "\xe2\x86\x92"
-check = green + "\xe2\x9c\x93" + reset
-pencil = "\xe2\x9c\x8e"
-update = "\xe2\x9c\x89"
-question = yellow + "?" + reset
+UP = RED + "\xe2\x86\x91" + RESET
+CROSS = RED + "\xe2\x9c\x97" + RESET
+RIGHT = "\xe2\x86\x92"
+CHECK = GREEN + "\xe2\x9c\x93" + RESET
+QUESTION = YELLOW + "?" + RESET
 
 # Quantities
 
-SYNC_INTERVAL = 1
+SYNC_INTERVAL = 10
 
 
 def ensure_file_exists(file_name):
@@ -51,9 +49,13 @@ def syscmd(cmd):
     p = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     out, err = p.communicate()
     if len(err) > 0:
-        raise RuntimeError
+        raise RuntimeError(err)
     return out
 
 
 def syscmd_ub(cmd):
     subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+
+
+def enclose_in_color(s, color):
+    return color + s + RESET

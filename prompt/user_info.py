@@ -1,4 +1,4 @@
-from neat_prompt import reset
+from util.util import enclose_in_color
 
 
 class UserInfo(object):
@@ -9,7 +9,9 @@ class UserInfo(object):
         self._host_color = None
 
     def __str__(self):
-        return self._user_name + "@" + self._host
+        colored_user_name = enclose_in_color(self.user_name, self.user_name_color)
+        colored_host = enclose_in_color(self.host, self.host_color)
+        return colored_user_name + "@" + colored_host
 
     @property
     def user_name(self):
@@ -39,6 +41,6 @@ class UserInfo(object):
     def host_color(self):
         return self._host_color
 
-    @user_name_color.setter
-    def user_name_color(self, c):
+    @host_color.setter
+    def host_color(self, c):
         self._host_color = c

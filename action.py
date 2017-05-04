@@ -6,7 +6,7 @@ import time
 from prompt.git_info import GitInfo, DOWNLOADING, IN_SYNC, NEWER, OLDER
 from prompt.user_info import UserInfo
 from util.util import ensure_file_exists, syscmd, STATUS_FILE, SYNC_INTERVAL, \
-    syscmd_ub
+    syscmd_ub, RED, YELLOW
 
 
 class Action(object):
@@ -22,6 +22,8 @@ class CollectUserInfoAction(Action):
         host = CollectUserInfoAction._get_host()
         name = getpass.getuser()
         user_info = UserInfo(name, host)
+        user_info.host_color = RED
+        user_info.user_name_color = YELLOW
         self._effect.payload = user_info
         return self._effect
 
@@ -41,8 +43,11 @@ class CollectGitInfoAction(Action):
     @staticmethod
     def _make_git_info():
         git_info = GitInfo()
-        git_info.branch_name = CollectGitInfoAction._get_branch_name()
-        git_info.status = CollectGitInfoAction._get_repo_status(git_info.branch_name)
+        git_info.is_repo = CollectGitInfoAction._is_repo()
+        if git_info.is_repo:
+            git_info.branch_name = CollectGitInfoAction._get_branch_name()
+            git_info.status = CollectGitInfoAction._get_repo_status(git_info.branch_name)
+            git_info.changed = CollectGitInfoAction._repo_modified()
         return git_info
 
     @staticmethod
@@ -104,3 +109,21 @@ class CollectGitInfoAction(Action):
         Asynchronously fetching and updating status file.
         """
         syscmd_ub(['python', 'fetch_and_update_status.py'])
+
+    @staticmethod
+    def _repo_modified():
+        cmd = ['git', 'status', '--porcelain']
+        res = syscmd(cmd)
+        l_dirt_status = [entry.split()[0] for entry in [l for l in res.split('\n') if len(l) > 0]]
+        modified = False
+        if 'M' in l_dirt_status:
+            modified = True
+        return modified
+
+    @staticmethod
+    def _is_repo():
+        try:
+            syscmd(['git', 'status'])
+            return True
+        except RuntimeError:
+            return False
