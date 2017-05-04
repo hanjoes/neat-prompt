@@ -37,14 +37,15 @@ class GitInfo(object):
         self._status = None
 
     def __str__(self):
+        result = "{0}(no_repository){1}".format(GREY, RESET)
         if self.is_repo:
             changed_mark = "*" if self._changed else ""
             branch_color = STATUS_VISUAL_MAP[self.status][0]
             symbol = STATUS_VISUAL_MAP[self.status][1]
-            return "{0}({2}{3}{1} {4}{0}{5}){1} {6} "\
-                .format(branch_color, RESET, changed_mark, self.branch_name, symbol, self.msg, RIGHT)
-        else:
-            return "{0}(no_repository){1}".format(GREY, RESET)
+            result = "{0}({2}{3}{1} {4}{0}{5}){1}"\
+                .format(branch_color, RESET, changed_mark, self.branch_name, symbol, self.msg)
+        result += RIGHT
+        return result
 
     @property
     def branch_name(self):
