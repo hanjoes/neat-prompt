@@ -4,7 +4,6 @@ import os
 import socket
 import time
 
-from generate import SCRIPT_FOLDER
 from prompt.git_info import GitInfo, DOWNLOADING, IN_SYNC, NEWER, OLDER
 from prompt.user_info import UserInfo
 from util.util import ensure_file_exists, syscmd, STATUS_FILE, SYNC_INTERVAL, \
