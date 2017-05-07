@@ -1,8 +1,10 @@
 import getpass
 import json
+import os
 import socket
 import time
 
+from generate import SCRIPT_FOLDER
 from prompt.git_info import GitInfo, DOWNLOADING, IN_SYNC, NEWER, OLDER
 from prompt.user_info import UserInfo
 from util.util import ensure_file_exists, syscmd, STATUS_FILE, SYNC_INTERVAL, \
@@ -36,6 +38,7 @@ class CollectUserInfoAction(Action):
 
 
 class CollectGitInfoAction(Action):
+
     def execute(self):
         self._effect.payload = self._make_git_info()
         return self._effect
@@ -108,7 +111,9 @@ class CollectGitInfoAction(Action):
         """
         Asynchronously fetching and updating status file.
         """
-        syscmd_ub(['python', 'fetch_and_update_status.py'])
+
+        folder = os.path.dirname(os.path.realpath(__file__))
+        syscmd_ub(['python', folder + '/fetch_and_update_status.py'])
 
     @staticmethod
     def _repo_modified():

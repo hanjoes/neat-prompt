@@ -1,6 +1,6 @@
 import subprocess
-from os import path
 from fcntl import lockf, LOCK_EX, LOCK_NB, LOCK_UN
+from os import path
 
 # Files
 

@@ -5,7 +5,6 @@ from effect.effect import SetUserInfoEffect, SetGitInfoEffect
 from flow.flow import Flow
 from prompt.prompt import Prompt
 
-
 logging.basicConfig(filename="/tmp/neat_prompt.log", level=logging.DEBUG)
 
 flow = Flow(Prompt())
