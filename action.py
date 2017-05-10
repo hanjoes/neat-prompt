@@ -79,14 +79,17 @@ class CollectGitInfoAction(Action):
 
     @staticmethod
     def _resolve_status(branch_name):
-        newer = CollectGitInfoAction._local_is_newer(branch_name)
-        older = CollectGitInfoAction._local_is_older(branch_name)
+        try:
+            newer = CollectGitInfoAction._local_is_newer(branch_name)
+            older = CollectGitInfoAction._local_is_older(branch_name)
 
-        if not newer and not older:
-            return IN_SYNC
-        elif newer:
-            return NEWER
-        else:
+            if not newer and not older:
+                return IN_SYNC
+            elif newer:
+                return NEWER
+            else:
+                return OLDER
+        except:
             return OLDER
 
     @staticmethod
