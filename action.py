@@ -56,7 +56,7 @@ class CollectGitInfoAction(Action):
     def _get_branch_name():
         cmd = ['git', 'symbolic-ref', 'HEAD']
         out = syscmd(cmd)
-        refs = out.strip().split('/')
+        refs = out.decode('utf-8').strip().split('/')
         branch = refs[2]
         return branch
 
@@ -120,7 +120,7 @@ class CollectGitInfoAction(Action):
     @staticmethod
     def _repo_modified():
         cmd = ['git', 'status', '--porcelain']
-        res = syscmd(cmd)
+        res = syscmd(cmd).decode('utf-8')
         l_dirt_status = [entry.split()[0] for entry in [l for l in res.split('\n') if len(l) > 0]]
         modified = False
         if 'M' in l_dirt_status:

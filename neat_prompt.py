@@ -185,7 +185,7 @@ def prompt():
         git_status = get_git_status()
     except RuntimeError as e:
         git_status = {'repo': False}
-    print assemble(name, host, git_status) + right + ' '
+    print(assemble(name, host, git_status) + right + ' ')
 
 
 if __name__ == '__main__':

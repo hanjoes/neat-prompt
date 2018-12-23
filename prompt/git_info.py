@@ -2,8 +2,8 @@
 # CONSTANTS
 from util.util import CYAN, UP, GREY, CROSS, GREEN, CHECK, YELLOW, QUESTION, RESET, RIGHT
 
-NO_REPO = "no-repository"
-FAILED = "failed"
+NO_REPO = 'no-repository'
+FAILED = 'failed'
 # ------------------------------
 
 # ------------------------------
@@ -18,12 +18,12 @@ DISCONNECTED = 5
 
 # Map from status -> (branch_color, symbol, message)
 STATUS_VISUAL_MAP = {
-    NEWER: (CYAN, UP, ""),
-    OLDER: (GREY, CROSS, "deprecated"),
-    IN_SYNC: (GREEN, CHECK, ""),
-    DOWNLOADING: (YELLOW, QUESTION, ""),
-    DISCONNECTED: (GREY, CROSS, ""),
-    NO_REPO: (GREY, "", "")
+    NEWER: (CYAN, UP, ''),
+    OLDER: (GREY, CROSS, 'deprecated'),
+    IN_SYNC: (GREEN, CHECK, ''),
+    DOWNLOADING: (YELLOW, QUESTION, ''),
+    DISCONNECTED: (GREY, CROSS, ''),
+    NO_REPO: (GREY, '', '')
 }
 
 
@@ -33,18 +33,18 @@ class GitInfo(object):
         self._is_repo = True
         self._branch_name = NO_REPO
         self._changed = False
-        self._msg = ""
+        self._msg = ''
         self._status = None
 
     def __str__(self):
-        result = "{0}(no_repository){1}".format(GREY, RESET)
+        result = '{0}(no_repository){1}'.format(GREY, RESET)
         if self.is_repo:
-            changed_mark = "*" if self._changed else ""
+            changed_mark = '*' if self._changed else ''
             branch_color = STATUS_VISUAL_MAP[self.status][0]
             symbol = STATUS_VISUAL_MAP[self.status][1]
-            result = "{0}({2}{3}{1} {4}{0}{5}){1}"\
+            result = '{0}({2}{3}{1} {4}{0}{5}){1}'\
                 .format(branch_color, RESET, changed_mark, self.branch_name, symbol, self.msg)
-        result += " " + RIGHT + " "
+        result += ' ' + RIGHT + ' '
         return result
 
     @property

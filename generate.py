@@ -11,4 +11,4 @@ flow = Flow(Prompt())
 flow.add_action(CollectUserInfoAction(SetUserInfoEffect()))
 flow.add_action(CollectGitInfoAction(SetGitInfoEffect()))
 flow.run()
-print flow.material
+print(flow.material)

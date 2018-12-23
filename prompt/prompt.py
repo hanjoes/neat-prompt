@@ -4,7 +4,7 @@ class Prompt(object):
         self._git_info = None
 
     def __str__(self):
-        return str(self._user_info) + " " + str(self._git_info)
+        return '{0} {1}'.format(self._user_info, self._git_info)
 
     @property
     def user_info(self):
